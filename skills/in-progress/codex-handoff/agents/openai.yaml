@@ -1,0 +1,5 @@
+interface:
+  display_name: "Codex Handoff"
+  short_description: "Fork this task and continue with its history"
+policy:
+  allow_implicit_invocation: false

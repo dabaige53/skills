@@ -39,6 +39,16 @@ npx skills@latest add mattpocock/skills
 
 4. Bam - you're ready to go.
 
+### Codex subagents in this fork
+
+The skills installer copies skills but does not install repository-level Codex agent profiles. If you use the Codex-specific subagent workflows in this fork, clone the repository and link its profiles once:
+
+```bash
+./scripts/link-codex-agents.sh
+```
+
+The script refuses to replace existing non-symlink agent files. Restart Codex or start a new task after linking so the profiles are loaded.
+
 ## Install as a Claude Code plugin
 
 Prefer a plug-and-play install you don't maintain by hand? These skills also ship as a native [Claude Code plugin](https://code.claude.com/docs/en/plugins). Instead of copying editable files into your repo, the plugin installs the whole skill set as a managed bundle that updates when I ship a new version — you subscribe rather than fork.
