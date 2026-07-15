@@ -1,31 +1,32 @@
 ---
 name: codex-handoff
-description: Fork the current Codex task and continue in a fresh task that inherits the completed conversation history. Use when the user asks to hand off or continue the current work in a new Codex task. Also supports producing a handoff prompt without creating a task when explicitly requested.
+description: Hand the current conversation off to a fresh Codex task that starts working immediately from a concise context summary. Use when the user asks to hand off or continue the current work in a new Codex task. Also supports returning the handoff prompt without creating a task when explicitly requested.
 ---
 
-Hand the current work to a fresh Codex task through the official thread-management tools. Do not use a subagent for handoff.
+Write a handoff summary of the current conversation so a fresh Codex task can continue the work. Instead of saving it, launch a new user-visible Codex task seeded with the summary as its initial prompt. It starts in the current project and returns immediately; the user manages it from the Codex task list.
 
-## Default: fork the current task
+Treat explicit invocation of this skill as authorization to create the new task. If the user explicitly asks for a prompt only, return the summary without creating anything.
 
-When the user asks to hand off or continue in a new task:
+Use the official Codex thread-management tools:
 
-1. Call `fork_thread` for the current task. Use the same directory by default; request a worktree only when the user explicitly asks for repository isolation.
-2. Remember that a fork inherits only completed conversation history. The active turn that performs the fork is not copied.
-3. Immediately call `send_message_to_thread` for the returned task ID with a concise continuation instruction that captures the user's latest objective and anything decided during the active turn.
-4. Give the fork a short descriptive title when the thread tools allow it.
-5. Report the new task ID or created-task directive.
+- Resolve the current saved project when project context is available, then call `create_thread` with its local environment and the handoff summary as the prompt.
+- Use a projectless task only when the current work is genuinely projectless.
+- Do not use `fork_thread`: handoff transfers distilled context, not the full conversation history.
+- Do not use a subagent: the destination must be a user-owned task that can be opened and continued directly.
+- Set a descriptive title such as `Fix login bug` or `Continue dashboard binding audit`.
 
-Do not paste a full conversation summary into the child: the fork already carries completed history. The follow-up message should contain only the delta needed to bridge the active turn:
+Include:
 
-- the next objective;
-- decisions or changes made during the active turn;
-- any new source-of-truth pointer;
-- boundaries and completion evidence that were not already in completed history.
+- **Objective:** what the new task should accomplish.
+- **Current state:** what has already been decided, changed, or verified.
+- **Source of truth:** files, commits, issues, URLs, tasks, logs, or commands to inspect first.
+- **Suggested skills:** only skills materially useful to the continuation.
+- **Boundaries:** what must not change without confirmation.
+- **Verification:** evidence that proves completion.
+- **Open questions:** only decisions that block the next action.
 
-Use `create_thread` instead of `fork_thread` only when the user explicitly asks for a clean task with no inherited conversation history.
+Do not duplicate content already captured in PRDs, plans, ADRs, issues, commits, diffs, or handoff artifacts. Reference them by path or URL instead.
 
-## Prompt-only mode
+Redact secrets, tokens, cookies, credentials, account values, personal data, and private URLs because the summary becomes the new task's prompt. If the user supplied arguments, use them as the destination task's focus.
 
-If the user explicitly says not to create or fork a task, return a concise handoff prompt instead. Include the objective, current state, source-of-truth pointers, boundaries, verification, and blocking questions. Reference existing artifacts instead of duplicating them.
-
-In both modes, redact secrets, tokens, cookies, credentials, personal data, and private URLs. Treat supplied arguments as the continuation focus.
+After creation, report the new task ID or created-task directive. In prompt-only mode, return the complete handoff summary.
