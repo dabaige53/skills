@@ -57,11 +57,6 @@ Each smell reads *what it is* → *how to fix*; match it against the diff:
 
 ### 4. Spawn both sub-agents in parallel
 
-Spawn both sub-agents before waiting for either result.
-
-- **Codex:** use `agent_type="standards-reviewer"` for Standards and `agent_type="spec-reviewer"` for Spec, both with `fork_turns="none"`.
-- **Claude Code:** use the `general-purpose` subagent for both.
-
 **Standards sub-agent prompt** — include:
 
 - The full diff command and commit list.
